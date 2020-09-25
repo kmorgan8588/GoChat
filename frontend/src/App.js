@@ -1,6 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import { connect, sendMessage } from './api/index';
+import Header from "./components/Header/Header"
 import './App.css';
 
 const App = () => {
@@ -13,6 +13,7 @@ const App = () => {
 
   return (
     <div className="App">
+      <Header />
       <button onClick={send}>Message</button>
     </div>
   );
