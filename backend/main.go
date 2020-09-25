@@ -9,21 +9,30 @@ import (
 )
 
 // serveWs handles requests to the /ws endpoint by upgrading the connection and passing off to the reader function
-func serveWs(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Host)
-
-	ws, err := websocket.Upgrade(w, r)
+func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Websocket Endpoint Hit")
+	conn, err := websocket.Upgrade(w, r)
 
 	if err != nil {
-		log.Println("Error upgrading connection: ", err)
+		fmt.Fprintf(w, "%+v\n", err)
 	}
 
-	go websocket.Writer(ws)
-	websocket.Reader(ws)
+	client := &websocket.Client{
+		Conn: conn,
+		Pool: pool,
+	}
+
+	pool.Register <- client
+	client.Read()
 }
 
 func setupRoutes() {
-	http.HandleFunc("/ws", serveWs)
+	pool := websocket.NewPool()
+	go pool.Start()
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(pool, w, r)
+	})
 }
 
 func main() {
