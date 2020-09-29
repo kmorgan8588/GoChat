@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { connect, sendMessage } from './api/index';
+import React, { useState } from "react";
+import { connect, sendMessage } from "./api/index";
 import Header from "./components/Header/Header"
-import ChatHistory from './components/ChatHistory/ChatHistory';
-import './App.css';
+import ChatHistory from "./components/ChatHistory/ChatHistory";
+import ChatInput from "./components/ChatInput/ChatInput";
+import "./App.css";
 
 const App = () => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -14,16 +15,18 @@ const App = () => {
     console.log(newChats);
   });
 
-  const send = () => {
-    console.log("hello");
-    sendMessage("hello");
+  const send = (event) => {
+    if (event.keyCode === 13) {
+      sendMessage(event.target.value);
+      event.target.value = "";
+    }
   }
 
   return (
     <div className="App">
       <Header />
       <ChatHistory chatHistory={chatHistory} />
-      <button onClick={send}>Message</button>
+      <ChatInput send={send} />
     </div>
   );
 }
